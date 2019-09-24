@@ -1,10 +1,176 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="utf-8" />
         <title>Doodle Jump</title>
     </head>
     <body>
-        <h1>This is a test</h1>
+        <script>
+
+            const platformWidth = 50;
+            const platformHeight = 10;
+            const canvasWidth = 400;
+            const canvasHeight = 600;
+            const playerWidth = 40;
+            const playerHeight = 60;
+            const platformAmount = 8;
+
+            var canvas;
+            var ctx;
+            var player;
+            var platforms;
+
+            class Platform{
+
+                constructor(x, y, width, height, jumpSpeed){
+                    this.x = Math.floor(x);
+                    this.y = Math.floor(y);
+                    this.width = width;
+                    this.height = height;
+                    this.jumpSpeed = jumpSpeed;
+                    console.log(width + ' '+height);
+                }
+
+                draw(ctx) {
+                    ctx.fillStyle = '#A52A2A';
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                }
+            }
+
+            class Player{
+                constructor(width, height, x, y){
+                    this.width = width;
+                    this.height = height;
+                    this.x = x;
+                    this.y = y;
+                    this.speed = 20;
+                }
+
+                moveX(amount){
+                    this.setPosition(this.x+amount, this.y);
+                }
+
+                collisionCheck(newY, objects){
+                    var objectId = -1;
+                    var firstY = newY+this.height;
+                    if(this.isFalling()){
+                        //Only check for collisions, if the player is falling
+                        for(i = 0; i < objects.length; i++){
+                            //Iterate through all the objects
+                            if(this.x < objects[i].x+objects[i].width && this.x + this.width > objects[i].x){
+                                //Check for matching x position
+                                if(this.y+this.height < objects[i].y && firstY >= objects[i].y){
+                                //if(this.y+this.height < objects[i].y+platformHeight && this.y+this.height > objects[i].y){
+                                    //Check if the old y is above the object and the new y is below
+                                    //Second term also checks, if the object is the nearest collision
+                                    firstY = objects[i].y;
+                                    objectId = i;
+                                }
+                            }
+                        }
+                    }
+                    if(objectId != -1){
+                        //If there is a collision the player jumps.
+                        console.log('Collision with: '+this.x+' '+this.y+' '+objects[objectId].x+' '+objects[objectId].y+' '+this.speed+' '+firstY);
+                        this.jump(objects[objectId].jumpSpeed);
+                    }
+                    return firstY-this.height;
+                }
+
+                isFalling(){
+                    if(this.speed < 0){
+                        return true;
+                    }
+                    return false;
+                }
+
+                setPosition(x, y){
+                    if(x < 0){
+                        this.x = 0;
+                    } else if(x > canvasWidth-this.width){
+                        this.x = canvasWidth-this.width;
+                    } else {
+                        this.x = x;
+                    }
+                    if(y < 0){
+                        this.y = 0;
+                    } else {
+                        this.y = y;
+                    }
+                }
+
+                update(ctx, objects){
+                    if(this.y + this.height >= canvasHeight){
+                        //Death
+                        console.log("Death");
+                    } else if(!this.isFalling() && this.y < canvasHeight * 0.3){
+                        //Move the objects
+                        for(i = 0; i < objects.length; i++){
+                            objects[i].y +=this.speed;
+                            if(objects[i].y > canvasHeight){
+                                objects[i] = new Platform(Math.random() * (canvasWidth-playerWidth), objects[i].y - canvasHeight, platformWidth, platformHeight, 20);
+                            }
+                        }
+                        this.speed--;
+                    } else {
+                        //Change the position
+                        this.setPosition(this.x, this.collisionCheck(this.y-this.speed, objects));
+                        this.speed--;
+                    }
+                    this.draw(ctx)
+                }
+
+                draw(ctx){
+                    ctx.fillStyle = '#008000';
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                }
+
+                jump(speed){
+                    this.speed = speed;
+                }
+            }
+
+            function setup(){
+                console.log("Setup started");
+                canvas = document.createElement('canvas');
+                canvas.id = "arena";
+                canvas.width = canvasWidth;
+                canvas.height = canvasHeight;
+                canvas.style = "border:3px solid #61210B;";	
+                document.body.appendChild(canvas);
+                ctx = canvas.getContext('2d');
+                platforms = [];
+                createPlatforms(platforms, platformAmount);
+                player = new Player(playerWidth, playerHeight, (canvasWidth-playerWidth)/2, 0.8*canvasHeight);
+            }
+
+            function createPlatforms(list, amount){
+                for(i = 0; i < amount; i++){
+                    list[i] = new Platform(Math.random()*(canvasWidth-platformWidth), Math.random()*(canvasHeight-platformHeight), platformWidth, platformHeight, 20);
+                }
+            }
+
+            function gameLoop(){
+                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+                for(i = 0; i < platforms.length; i++){
+                    platforms[i].draw(ctx);
+                }
+
+                player.update(ctx, platforms);
+
+                setTimeout(gameLoop, 15);
+            }
+
+            setup();
+
+            window.addEventListener("deviceorientation", function(event) {
+                player.moveX(event.gamma);
+            }, true);
+            gameLoop();
+        
+        
+        </script>
     </body>
 
 </html>
