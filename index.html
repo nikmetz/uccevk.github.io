@@ -9,8 +9,8 @@
 
             const platformWidth = 50;
             const platformHeight = 10;
-            const canvasWidth = 400;
-            const canvasHeight = window.innerHeight-50;
+            var canvasWidth = 400;
+            var canvasHeight = window.innerHeight-25;
             const playerWidth = 40;
             const playerHeight = 60;
             const platformAmount = 8;
@@ -20,7 +20,7 @@
             var ctx;
             var player;
             var platforms;
-            var state = 0;
+            var state;
             /* 0 = in main menu
             ** 1 = in game
             */
@@ -106,7 +106,7 @@
                 update(ctx, objects){
                     if(this.y + this.height >= canvasHeight){
                         //Death
-                        state == 0;
+                        state = 0;
                     } else if(!this.isFalling() && this.y < canvasHeight * 0.3){
                         //Move the objects
                         for(i = 0; i < objects.length; i++){
@@ -135,7 +135,7 @@
             }
 
             function canvasSetup(){
-                console.log("Setup started");
+                console.log("Canvas setup started");
                 canvas = document.createElement('canvas');
                 canvas.id = "arena";
                 canvas.width = canvasWidth;
@@ -146,6 +146,7 @@
             }
 
             function gameSetup(){
+                console.log("Game setup started")
                 platforms = [];
                 createPlatforms(platforms, platformAmount);
                 player = new Player(playerWidth, playerHeight, (canvasWidth-playerWidth)/2, 0.8*canvasHeight);
@@ -174,34 +175,28 @@
             }
 
             function menu(){
-                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+                state = 0;
+                if(canvas != null){
+                    document.body.removeChild(canvas);
+                }
 
-                ctx.font = "25pt Arial";
-                ctx.fillStyle = "Gray";
-                ctx.fillText("PLAY", canvasWidth/2 - 50, canvasHeight/2 - 50);
-
-                if(state == 0){
-                    setTimeout(menu, 15);
-                } else if(state == 1){
+                var d = document.createElement('div');
+                d.id = 'd';
+                d.style.textAlign = 'center';
+                d.style.paddingTop = "150px";
+                document.body.appendChild(d);
+                d.appendChild(document.createTextNode("PLAY"));
+                d.addEventListener("click", function(){
+                    d.parentNode.removeChild(d);
+                    state = 1;
+                    canvasSetup();
                     gameSetup();
                     gameLoop();
                 }
 
-            }
+                );
 
-            function getMousePos(event) {
-                var rect = canvas.getBoundingClientRect();
-                return {
-                    x: event.clientX - rect.left,
-                    y: event.clientY - rect.top
-                };
             }
-
-            function isInside(pos, rect){
-                return pos.x > rect.x && pos.x < rect.x+rect.width && pos.y < rect.y+rect.height && pos.y > rect.y
-            }
-
-            canvasSetup();
 
             window.addEventListener("deviceorientation", function(event) {
                 if(state == 1){
@@ -209,18 +204,11 @@
                 }
             }, true);
 
-            window.addEventListener('click', function(event) {
-                var mousePos = getMousePos(event);
-                var rect = {
-                    x: 0,
-                    y: 0,
-                    width: canvasWidth,
-                    height: canvasHeight,
-                };
-                if (isInside(mousePos,rect) && state == 0) {
-                    state = 1;
-                }   
-            }, false);
+            document.onmousemove = function(e){
+                if(state == 1){
+                    player.moveX((e.pageX-player.x)/4);
+                }
+            };
 
             menu();
         
