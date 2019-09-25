@@ -23,6 +23,7 @@
             var playerWidth = 0.8*platformWidth;
             var playerHeight = 1.5*playerWidth;
             var platformAmount = 2*Math.floor(canvasHeight/100);
+            var jSpeed = 0.04*canvasHeight;
 
 
             var canvas;
@@ -56,7 +57,7 @@
                     this.height = height;
                     this.x = x;
                     this.y = y;
-                    this.speed = 20;
+                    this.speed = jSpeed;
                 }
 
                 moveX(amount){
@@ -121,7 +122,7 @@
                         for(i = 0; i < objects.length; i++){
                             objects[i].y +=this.speed;
                             if(objects[i].y > canvasHeight){
-                                objects[i] = new Platform(Math.random() * (canvasWidth-playerWidth), objects[i].y - canvasHeight, platformWidth, platformHeight, 25);
+                                objects[i] = new Platform(Math.random() * (canvasWidth-playerWidth), objects[i].y - canvasHeight, platformWidth, platformHeight, jSpeed);
                             }
                         }
                         this.speed--;
@@ -171,9 +172,9 @@
             }
 
             function createPlatforms(list, amount){
-                list[0] = new Platform((canvasWidth-platformWidth)/2, 0.9*canvasHeight, platformWidth, platformHeight, 25);
+                list[0] = new Platform((canvasWidth-platformWidth)/2, 0.9*canvasHeight, platformWidth, platformHeight, jSpeed);
                 for(i = 1; i < amount; i++){
-                    list[i] = new Platform(Math.random()*(canvasWidth-platformWidth), Math.random()*(canvasHeight-platformHeight), platformWidth, platformHeight, 25);
+                    list[i] = new Platform(Math.random()*(canvasWidth-platformWidth), Math.random()*(canvasHeight-platformHeight), platformWidth, platformHeight, jSpeed);
                 }
             }
 
