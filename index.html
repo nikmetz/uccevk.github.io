@@ -16,12 +16,12 @@
     <body>
         <script>
 
-            const platformWidth = 50;
-            const platformHeight = 10;
             var canvasHeight = window.innerHeight-25;
             var canvasWidth = Math.min(window.innerWidth, 0.75*canvasHeight);
-            const playerWidth = 40;
-            const playerHeight = 60;
+            var platformWidth = 0.15*canvasWidth;
+            var platformHeight = 0.15*platformWidth;
+            var playerWidth = 0.8*platformWidth;
+            var playerHeight = 1.5*playerWidth;
             var platformAmount = 2*Math.floor(canvasHeight/100);
 
 
