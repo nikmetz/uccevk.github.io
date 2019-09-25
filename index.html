@@ -18,11 +18,11 @@
 
             const platformWidth = 50;
             const platformHeight = 10;
-            var canvasWidth = 400;
             var canvasHeight = window.innerHeight-25;
+            var canvasWidth = Math.min(window.innerWidth, 0.75*canvasHeight);
             const playerWidth = 40;
             const playerHeight = 60;
-            const platformAmount = 8;
+            var platformAmount = 2*Math.floor(canvasHeight/100);
 
 
             var canvas;
@@ -121,7 +121,7 @@
                         for(i = 0; i < objects.length; i++){
                             objects[i].y +=this.speed;
                             if(objects[i].y > canvasHeight){
-                                objects[i] = new Platform(Math.random() * (canvasWidth-playerWidth), objects[i].y - canvasHeight, platformWidth, platformHeight, 20);
+                                objects[i] = new Platform(Math.random() * (canvasWidth-playerWidth), objects[i].y - canvasHeight, platformWidth, platformHeight, 25);
                             }
                         }
                         this.speed--;
@@ -145,6 +145,14 @@
 
             function canvasSetup(){
                 console.log("Canvas setup started");
+                /*if((innerWidth/innerHeight)<canvasWidth/canvasHeight){
+                    canvasWidth = window.innerHeight*(canvasWidth/canvasHeight) - 16;
+                    canvasHeight = window.innerHeight - 16;
+                }else {
+                    canvasWidth = window.innerWidth - 16;
+                    canvasHeight = window.innerWidth/(canvasWidth/canvasHeight) -16;
+                }*/
+
                 canvas = document.createElement('canvas');
                 canvas.id = "arena";
                 canvas.width = canvasWidth;
@@ -163,9 +171,9 @@
             }
 
             function createPlatforms(list, amount){
-                list[0] = new Platform((canvasWidth-platformWidth)/2, 0.9*canvasHeight, platformWidth, platformHeight, 20);
+                list[0] = new Platform((canvasWidth-platformWidth)/2, 0.9*canvasHeight, platformWidth, platformHeight, 25);
                 for(i = 1; i < amount; i++){
-                    list[i] = new Platform(Math.random()*(canvasWidth-platformWidth), Math.random()*(canvasHeight-platformHeight), platformWidth, platformHeight, 20);
+                    list[i] = new Platform(Math.random()*(canvasWidth-platformWidth), Math.random()*(canvasHeight-platformHeight), platformWidth, platformHeight, 25);
                 }
             }
 
@@ -195,6 +203,7 @@
                 d.style.height = 400;
                 d.style.textAlign = 'center';
                 d.style.paddingTop = "150px";
+                d.style.fontSize = (canvasHeight/10)+'px';
                 document.body.appendChild(d);
                 d.appendChild(document.createTextNode("PLAY"));
                 d.addEventListener("click", function(){
