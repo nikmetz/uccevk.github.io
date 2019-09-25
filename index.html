@@ -10,15 +10,20 @@
             const platformWidth = 50;
             const platformHeight = 10;
             const canvasWidth = 400;
-            const canvasHeight = 600;
+            const canvasHeight = window.innerHeight-50;
             const playerWidth = 40;
             const playerHeight = 60;
             const platformAmount = 8;
+
 
             var canvas;
             var ctx;
             var player;
             var platforms;
+            var state = 0;
+            /* 0 = in main menu
+            ** 1 = in game
+            */
 
             class Platform{
 
@@ -28,7 +33,6 @@
                     this.width = width;
                     this.height = height;
                     this.jumpSpeed = jumpSpeed;
-                    console.log(width + ' '+height);
                 }
 
                 draw(ctx) {
@@ -71,7 +75,7 @@
                     }
                     if(objectId != -1){
                         //If there is a collision the player jumps.
-                        console.log('Collision with: '+this.x+' '+this.y+' '+objects[objectId].x+' '+objects[objectId].y+' '+this.speed+' '+firstY);
+                        //console.log('Collision with: '+this.x+' '+this.y+' '+objects[objectId].x+' '+objects[objectId].y+' '+this.speed+' '+firstY);
                         this.jump(objects[objectId].jumpSpeed);
                     }
                     return firstY-this.height;
@@ -102,7 +106,7 @@
                 update(ctx, objects){
                     if(this.y + this.height >= canvasHeight){
                         //Death
-                        console.log("Death");
+                        state == 0;
                     } else if(!this.isFalling() && this.y < canvasHeight * 0.3){
                         //Move the objects
                         for(i = 0; i < objects.length; i++){
@@ -130,7 +134,7 @@
                 }
             }
 
-            function setup(){
+            function canvasSetup(){
                 console.log("Setup started");
                 canvas = document.createElement('canvas');
                 canvas.id = "arena";
@@ -139,13 +143,17 @@
                 canvas.style = "border:3px solid #61210B;";	
                 document.body.appendChild(canvas);
                 ctx = canvas.getContext('2d');
+            }
+
+            function gameSetup(){
                 platforms = [];
                 createPlatforms(platforms, platformAmount);
                 player = new Player(playerWidth, playerHeight, (canvasWidth-playerWidth)/2, 0.8*canvasHeight);
             }
 
             function createPlatforms(list, amount){
-                for(i = 0; i < amount; i++){
+                list[0] = new Platform((canvasWidth-platformWidth)/2, 0.9*canvasHeight, platformWidth, platformHeight, 20);
+                for(i = 1; i < amount; i++){
                     list[i] = new Platform(Math.random()*(canvasWidth-platformWidth), Math.random()*(canvasHeight-platformHeight), platformWidth, platformHeight, 20);
                 }
             }
@@ -158,16 +166,63 @@
                 }
 
                 player.update(ctx, platforms);
-
-                setTimeout(gameLoop, 15);
+                if(state == 1){
+                    setTimeout(gameLoop, 15);
+                } else if(state == 0){
+                    menu();
+                }
             }
 
-            setup();
+            function menu(){
+                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+                ctx.font = "25pt Arial";
+                ctx.fillStyle = "Gray";
+                ctx.fillText("PLAY", canvasWidth/2 - 50, canvasHeight/2 - 50);
+
+                if(state == 0){
+                    setTimeout(menu, 15);
+                } else if(state == 1){
+                    gameSetup();
+                    gameLoop();
+                }
+
+            }
+
+            function getMousePos(event) {
+                var rect = canvas.getBoundingClientRect();
+                return {
+                    x: event.clientX - rect.left,
+                    y: event.clientY - rect.top
+                };
+            }
+
+            function isInside(pos, rect){
+                return pos.x > rect.x && pos.x < rect.x+rect.width && pos.y < rect.y+rect.height && pos.y > rect.y
+            }
+
+            canvasSetup();
 
             window.addEventListener("deviceorientation", function(event) {
-                player.moveX(event.gamma);
+                if(state == 1){
+                    player.moveX(event.gamma/2);
+                }
             }, true);
-            gameLoop();
+
+            window.addEventListener('click', function(event) {
+                var mousePos = getMousePos(event);
+                var rect = {
+                    x: 0,
+                    y: 0,
+                    width: canvasWidth,
+                    height: canvasHeight,
+                };
+                if (isInside(mousePos,rect) && state == 0) {
+                    state = 1;
+                }   
+            }, false);
+
+            menu();
         
         
         </script>
