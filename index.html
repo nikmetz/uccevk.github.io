@@ -3,6 +3,15 @@
     <head>
         <meta charset="utf-8" />
         <title>Doodle Jump</title>
+        <style>
+            canvas {
+                padding-left: 0;
+                padding-right: 0;
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
+            }
+        </style>
     </head>
     <body>
         <script>
@@ -141,6 +150,7 @@
                 canvas.width = canvasWidth;
                 canvas.height = canvasHeight;
                 canvas.style = "border:3px solid #61210B;";	
+                canvas.style.alignContent = 'center';
                 document.body.appendChild(canvas);
                 ctx = canvas.getContext('2d');
             }
@@ -182,6 +192,7 @@
 
                 var d = document.createElement('div');
                 d.id = 'd';
+                d.style.height = 400;
                 d.style.textAlign = 'center';
                 d.style.paddingTop = "150px";
                 document.body.appendChild(d);
@@ -206,7 +217,8 @@
 
             document.onmousemove = function(e){
                 if(state == 1){
-                    player.moveX((e.pageX-player.x)/4);
+                    var rect = canvas.getBoundingClientRect();
+                    player.moveX((e.pageX-player.x-rect.left)/4);
                 }
             };
 
