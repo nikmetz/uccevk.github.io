@@ -22,8 +22,8 @@
             var platformHeight = 0.15*platformWidth;
             var playerWidth = 0.8*platformWidth;
             var playerHeight = 1.5*playerWidth;
-            var platformAmount = 1.5*Math.floor(canvasHeight/100);
-            var jSpeed = 0.04*canvasHeight;
+            var platformAmount = 1.25*Math.floor(canvasHeight/100);
+            var jSpeed = 0.035*canvasHeight;
 
 
             var canvas;
@@ -228,7 +228,7 @@
             document.onmousemove = function(e){
                 if(state == 1){
                     var rect = canvas.getBoundingClientRect();
-                    player.moveX((e.pageX-player.x-rect.left)/4);
+                    player.moveX((e.pageX-player.x-rect.left-(playerWidth/2))/4);
                 }
             };
 
